@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { db } from '../../../../lib/db';
 
 export async function GET(
   request: Request,
@@ -7,15 +8,17 @@ export async function GET(
   try {
     const { lessonId } = await params;
 
-    // 1. 於資料庫查詢課程內容（目前使用模擬資料）
-    const mockLesson = {
-      id: lessonId,
-      title: 'React Hooks 入門',
-      content: 'Hooks 可讓您在 Function Component 中使用 State...',
-      sourceReference: 'react_basics.pdf 第 3 頁',
-    };
+    // 1. 於資料庫查詢課程內容
+    const lesson = await db.lesson.findUnique({
+      where: { id: lessonId },
+    });
 
-    return NextResponse.json(mockLesson);
+    // 2. 找不到對應的課程內容
+    if (!lesson) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(lesson);
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }

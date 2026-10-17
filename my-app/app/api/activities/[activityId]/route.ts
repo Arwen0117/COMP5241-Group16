@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { db } from '../../../../lib/db';
 
 export async function GET(
   request: Request,
@@ -7,21 +8,17 @@ export async function GET(
   try {
     const { activityId } = await params;
 
-    // 1. 於資料庫查詢活動資料（目前使用模擬資料）
-    const mockActivity = {
-      id: activityId,
-      type: 'quiz',
-      content: [
-        {
-          question: 'useState 返回什麼？',
-          options: ['一個數字', '一個數組', '一個函數', '一個 Promise'],
-          correctAnswerIndex: 1,
-        },
-      ],
-      config: { timeLimit: 60 },
-    };
+    // 1. 於資料庫查詢活動資料
+    const activity = await db.activity.findUnique({
+      where: { id: activityId },
+    });
 
-    return NextResponse.json(mockActivity);
+    // 2. 找不到對應的活動
+    if (!activity) {
+      return NextResponse.json({ error: 'Activity not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(activity);
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
