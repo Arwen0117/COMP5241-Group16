@@ -84,6 +84,8 @@ model Event {
 
   // Score obtained (null when the activity is not graded)
   score     Int?
+  // Maximum score the activity is worth (null when the activity is not graded)
+  maxScore  Int?
   // Time spent on the activity, in seconds
   timeSpent Int
 

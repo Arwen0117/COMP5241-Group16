@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
     // 2. 接收前端傳送的 JSON 資料
     const body = await request.json();
-    const { userId, activityId, score, timeSpent } = body;
+    const { userId, activityId, score, maxScore, timeSpent } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
         userId,
         activityId,
         score: typeof score === 'number' ? score : null,
+        maxScore: typeof maxScore === 'number' ? maxScore : null,
         timeSpent: typeof timeSpent === 'number' ? timeSpent : 0,
       },
     });
