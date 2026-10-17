@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { activityId: string } }
+  { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
-    const activityId = params.activityId;
+    const { activityId } = await params;
 
     // 1. 於資料庫查詢活動資料（目前使用模擬資料）
     const mockActivity = {

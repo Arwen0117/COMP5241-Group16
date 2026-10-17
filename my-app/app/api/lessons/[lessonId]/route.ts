@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { lessonId: string } }
+  { params }: { params: Promise<{ lessonId: string }> }
 ) {
   try {
-    const lessonId = params.lessonId;
+    const { lessonId } = await params;
 
     // 1. 於資料庫查詢課程內容（目前使用模擬資料）
     const mockLesson = {
