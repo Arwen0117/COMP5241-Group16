@@ -1,0 +1,98 @@
+// Prisma schema (Prisma ORM v7)
+// Docs: https://www.prisma.io/docs/orm/prisma-schema/overview
+//
+// NOTE: the database URL is NOT declared here anymore (deprecated in v7).
+// It is configured in `prisma.config.ts` via the DATABASE_URL env var.
+
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+// ---------- User ----------
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String
+  // "student" | "instructor" | "admin"
+  role  String @default("student")
+
+  // Instructor of the courses they teach
+  courses Course[]
+  // Learning events (answers / scores) this user generated
+  events  Event[]
+
+  @@index([role])
+}
+
+// ---------- Course ----------
+model Course {
+  id    String @id @default(cuid())
+  title String
+
+  instructorId String
+  instructor   User   @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+
+  lessons Lesson[]
+
+  @@index([instructorId])
+}
+
+// ---------- Lesson ----------
+model Lesson {
+  id      String @id @default(cuid())
+  title   String
+  content String
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  activities Activity[]
+
+  @@index([courseId])
+}
+
+// ---------- Activity ----------
+model Activity {
+  id   String @id @default(cuid())
+  // e.g. "quiz" | "flashcard" | "code"
+  type String
+
+  // Activity body (questions, prompts, ...) and its behaviour settings
+  content Json
+  config  Json
+
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  events Event[]
+
+  @@index([lessonId])
+  @@index([type])
+}
+
+// ---------- Event ----------
+model Event {
+  id String @id @default(cuid())
+
+  userId     String
+  activityId String
+
+  // Score obtained (null when the activity is not graded)
+  score     Int?
+  // Maximum score the activity is worth (null when the activity is not graded)
+  maxScore  Int?
+  // Time spent on the activity, in seconds
+  timeSpent Int
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([activityId])
+  @@index([userId, activityId])
+}
