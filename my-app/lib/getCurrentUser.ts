@@ -44,7 +44,7 @@ export async function getSession(): Promise<Session | null> {
   if (isMockAuthEnabled()) {
     return {
       user: { ...MOCK_USER, image: null },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      expires: '2099-01-01T00:00:00.000Z',
     } as Session;
   }
 
